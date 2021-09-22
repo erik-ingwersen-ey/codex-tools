@@ -140,17 +140,11 @@ def get_code_chunks(code):
         chunks (list): The code split into chunks beginning with each function definition line.
 
     """
-    chunks = []
-    for chunk in code.split('\n\n'):
-        #print("Chunk:\n",chunk)
-        if re.match(r'\s*\n*def ', chunk):
-        # If the function definition line is indented (starts with whitespace), skip it.
-            if re.match(r'\s+def ', chunk):
-                pass
-            else:
-                chunks.append(chunk)
-
-    return chunks
+    return [
+        chunk
+        for chunk in code.split('\n\n')
+        if re.match(r'\s*\n*def ', chunk) and not re.match(r'\s+def ', chunk)
+    ]
 
 def get_prompt(code_chunk):
     """
@@ -166,13 +160,13 @@ def get_prompt(code_chunk):
         prompt (str): A prompt for the user.
 
     """
-    #print(code_chunk.split('\n')[0])
-    prompt = '\n\n'.join([
-        open('autodocstring-example.txt').read(),
-        code_chunk,
-        '#autodoc: A comprehensive PEP 257 Google style doctring, including a brief one-line summary of the function.',
-    ])
-    return prompt
+    return '\n\n'.join(
+        [
+            open('autodocstring-example.txt').read(),
+            code_chunk,
+            '#autodoc: A comprehensive PEP 257 Google style doctring, including a brief one-line summary of the function.',
+        ]
+    )
 
 def get_response(prompt):
     """
